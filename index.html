@@ -1,21 +1,65 @@
 <!DOCTYPE html>
 <html>
+  
   <head>
+    <link rel="stylesheet" href="bootstrap-3.2.0-dist/css/bootstrap.css">
+    <link rel="stylesheet" href="css/bootstrap-theme.css">
+    <link rel="stylesheet" href="custom.css">
+    <script src="bootstrap-3.2.0-dist/js/bootstrap.js"></script>
+    <script src="moment.js"></script>
     <script src="jquery.js"></script>
     <script src="data_generator.js"></script>
   </head>
+
   <body>
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+        <a class="navbar-brand" href="#">Twittler</a>
+      </div>
+        <div class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+              <li class="active"><a href="#"><span class="glyphicon glyphicon-home"></span> Home</a></li>
+              <li><a href="#about"><span class="glyphicon glyphicon-th-list"></span> People</a></li>
+              <li><a href="#contact"><span class="glyphicon glyphicon-user"></span> Profile</a></li>
+              <li><a href="#compose" class="btn btn-default"><span class="glyphicon glyphicon-pencil"></span> Compose</a>
+            </ul>
+        </div><!--/.nav-collapse -->
+    </div>
+    </nav>
+
+    <div class="container">
+      <ol class="breadcrumb">
+        <li><a href="#">Home</a></li>
+        <li><a href="#">Library</a></li>
+        <li class="active">Data</li>
+      </ol>
+    </div>
+
+    <div class="container content-div">
+    </div>
+
     <script>
 
       $(document).ready(function(){
-        var $body = $('body');
+        var $body = $('.content-div');
         $body.html('');
 
         var index = streams.home.length - 1;
         while(index >= 0){
           var tweet = streams.home[index];
+          var prettyTime = moment(tweet.created_at).fromNow();
+          /*
           var $tweet = $('<div></div>');
           $tweet.text('@' + tweet.user + ': ' + tweet.message);
+          */
+          var $tweet = $('<div class="panel panel-default"><div class="panel-body">' + '@' + tweet.user + ': ' + tweet.message +'</div><div class="panel-footer">' + prettyTime +'</div></div>');
           $tweet.appendTo($body);
           index -= 1;
         }
