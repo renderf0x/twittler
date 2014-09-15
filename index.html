@@ -3,12 +3,13 @@
   
   <head>
     <link rel="stylesheet" href="bootstrap-3.2.0-dist/css/bootstrap.css">
-    <link rel="stylesheet" href="css/bootstrap-theme.css">
+    <link rel="stylesheet" href="bootstrap-3.2.0-dist/css/bootstrap-theme.css">
     <link rel="stylesheet" href="custom.css">
-    <script src="bootstrap-3.2.0-dist/js/bootstrap.js"></script>
     <script src="moment.js"></script>
     <script src="jquery.js"></script>
+    <script src="bootstrap-3.2.0-dist/js/bootstrap.js"></script>
     <script src="data_generator.js"></script>
+    <title>Twittler</title>
   </head>
 
   <body>
@@ -51,7 +52,13 @@
         var $body = $('.content-div');
         $body.html('');
 
+        //globals
+        var applicationState = {
+          alertDisplayed: false
+        };
+
         var index = streams.home.length - 1;
+        var lastFetchIndex = index;
         while(index >= 0){
           var tweet = streams.home[index];
           var prettyTime = moment(tweet.created_at).fromNow();
@@ -59,10 +66,53 @@
           var $tweet = $('<div></div>');
           $tweet.text('@' + tweet.user + ': ' + tweet.message);
           */
-          var $tweet = $('<div class="panel panel-default"><div class="panel-body">' + '@' + tweet.user + ': ' + tweet.message +'</div><div class="panel-footer">' + prettyTime +'</div></div>');
+          var $tweet = $('<div class="panel panel-default"><div class="panel-body">' + tweet.message +'</div><div class="panel-footer">' + '<strong>@' + tweet.user + '</strong> ' + '<small><em>' + prettyTime + '</em></small>' + '</div></div>');
           $tweet.appendTo($body);
           index -= 1;
         }
+
+
+        var getNewTweets = function (user){ //specify user for specific user's new tweets
+          var newIndex;
+          //iterate through streams.
+          if (1){ //home stream, no user specified
+            newIndex = streams.home.length - 1;
+            while(newIndex > lastFetchIndex){
+              var tweet = streams.home[newIndex];
+              var prettyTime = moment(tweet.created_at).fromNow();
+      
+              var $tweet = $('<div class="panel panel-default"><div class="panel-body">' + tweet.message +'</div><div class="panel-footer">' + '<strong>@' + tweet.user + '</strong> ' + '<small><em>' + prettyTime + '</em></small>' + '</div></div>');
+              $tweet.prependTo($body);
+              newIndex -= 1;
+
+
+              }
+              lastFetchIndex = streams.home.length -1;
+            }
+
+        };
+
+        var mainTimer = function(){
+         setTimeout(function (){
+              console.log("Timer called");
+              var numNewTweets = streams.home.length - 1 - lastFetchIndex;
+              if(numNewTweets > 0){
+                document.title = "(" + (streams.home.length - 1 - lastFetchIndex) + ")" + " Twittler";
+                var $newTweetsMessage = $('<div class="alert alert-info"><a href="#">Click here to display ' + numNewTweets + ' new Tweets</a></div>');
+                if (!applicationState.alertDisplayed){
+                  $newTweetsMessage.prependTo($body);
+                  applicationState.alertDisplayed = true;
+                }else{
+                  $(".alert").html($newTweetsMessage);
+                }
+                //getNewTweets();
+              }
+              mainTimer();
+
+            }, 5000);
+        }
+
+        mainTimer();
 
       });
 

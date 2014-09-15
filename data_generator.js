@@ -44,6 +44,7 @@ var generateRandomTweet = function(){
   tweet.message = randomMessage();
   tweet.created_at = new Date();
   addTweet(tweet);
+  //console.log("New tweet generated");
 };
 
 for(var i = 0; i < 10; i++){
