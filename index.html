@@ -26,7 +26,7 @@
       </div>
         <div class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
-              <li class="active"><a href="#"><span class="glyphicon glyphicon-home"></span> Home</a></li>
+              <li class="active"><a class="homelink" href="#"><span class="glyphicon glyphicon-home"></span> Home</a></li>
               <li><a href="#about"><span class="glyphicon glyphicon-th-list"></span> People</a></li>
               <li><a href="#contact"><span class="glyphicon glyphicon-user"></span> Profile</a></li>
               <li><a href="#compose" class="btn btn-default"><span class="glyphicon glyphicon-pencil"></span> Compose</a>
@@ -54,7 +54,8 @@
 
         //globals
         var applicationState = {
-          alertDisplayed: false
+          alertDisplayed: false,
+          mode: "home"
         };
 
         var index = streams.home.length - 1;
@@ -66,7 +67,7 @@
           var $tweet = $('<div></div>');
           $tweet.text('@' + tweet.user + ': ' + tweet.message);
           */
-          var $tweet = $('<div class="panel panel-default"><div class="panel-body">' + tweet.message +'</div><div class="panel-footer">' + '<strong>@' + tweet.user + '</strong> ' + '<small><em>' + prettyTime + '</em></small>' + '</div></div>');
+          var $tweet = $('<div class="panel panel-default"><div class="panel-body">' + tweet.message +'</div><div class="panel-footer">' + '<a class="userlink" href="#"><strong>@' + tweet.user + '</strong></a> ' + '<small><em>' + prettyTime + '</em></small>' + '</div></div>');
           $tweet.appendTo($body);
           index -= 1;
         }
@@ -81,7 +82,7 @@
               var tweet = streams.home[newIndex];
               var prettyTime = moment(tweet.created_at).fromNow();
       
-              var $tweet = $('<div class="panel panel-default"><div class="panel-body">' + tweet.message +'</div><div class="panel-footer">' + '<strong>@' + tweet.user + '</strong> ' + '<small><em>' + prettyTime + '</em></small>' + '</div></div>');
+              var $tweet = $('<div class="panel panel-default"><div class="panel-body">' + tweet.message +'</div><div class="panel-footer">' + '<a class="userlink" href="#"><strong>@' + tweet.user + '</strong></a> ' + '<small><em>' + prettyTime + '</em></small>' + '</div></div>');
               $tweet.prependTo($body);
               newIndex -= 1;
 
@@ -92,26 +93,87 @@
 
         };
 
+        var activateUserLinks = function() {
+          $('.userlink').click(function(){
+              //console.log("User link clicked");
+              var $username = $(this).text().substring(1);
+              //console.log("User is " + $username);
+              applicationState.alertDisplayed = false;
+              displayUserTweets($username);
+              applicationState.mode = "user";
+          });
+        };
+
+        var displayUserTweets = function(username){
+          $body.html('');
+          var userIndex = streams.users[username].length - 1;
+          //console.log("User Index is " + userIndex);
+          while(userIndex >= 0){
+            var tweet = streams.users[username][userIndex];
+            var prettyTime = moment(tweet.created_at).fromNow();
+          
+            var $tweet = $('<div class="panel panel-default"><div class="panel-body">' + tweet.message +'</div><div class="panel-footer">' + '<a class="userlink" href="#"><strong>@' + tweet.user + '</strong></a> ' + '<small><em>' + prettyTime + '</em></small>' + '</div></div>');
+            $tweet.appendTo($body);
+            userIndex -= 1;
+          }
+        };
+
+        var titleSet = function(numTweets){
+          if (numTweets == 0){
+            document.title = "Twittler";
+          }else{
+            document.title = "(" + numTweets + ")" + " Twittler";
+          }
+        };
+
+        var initNav = function(){
+          $('.homelink').click(function(){
+              if(applicationState.mode === "home"){
+                //do nothing for now
+              }else{
+                applicationState.mode = "home";
+                lastFetchIndex = 0;
+                $body.html('');
+                getNewTweets();
+              }
+          });
+        };
+
         var mainTimer = function(){
          setTimeout(function (){
-              console.log("Timer called");
-              var numNewTweets = streams.home.length - 1 - lastFetchIndex;
-              if(numNewTweets > 0){
-                document.title = "(" + (streams.home.length - 1 - lastFetchIndex) + ")" + " Twittler";
-                var $newTweetsMessage = $('<div class="alert alert-info"><a href="#">Click here to display ' + numNewTweets + ' new Tweets</a></div>');
-                if (!applicationState.alertDisplayed){
-                  $newTweetsMessage.prependTo($body);
-                  applicationState.alertDisplayed = true;
-                }else{
-                  $(".alert").html($newTweetsMessage);
-                }
-                //getNewTweets();
+              //console.log("Timer called");
+              if (applicationState.mode === "home"){
+                  var numNewTweets = streams.home.length - 1 - lastFetchIndex;
+                  if(numNewTweets > 0){
+                    titleSet(streams.home.length - 1 - lastFetchIndex);
+                    var $newTweetsMessage = $('<a href="#">Click here to display ' + numNewTweets + ' new Tweets</a>');
+                    if (!applicationState.alertDisplayed){
+                      var $alertDiv = $('<div class="alert alert-info"></div>')
+                      $alertDiv.prependTo($body);
+                      applicationState.alertDisplayed = true;
+                    }
+
+                    $(".alert").html($newTweetsMessage).click(function(){
+                        getNewTweets();
+                        applicationState.alertDisplayed = false;
+                        titleSet(0);
+                        $(this).remove();
+                    });
+
+                    activateUserLinks();
+                    //getNewTweets();
+                  }
+              }else if(applicationState.mode === "user"){
+                console.log("In User State");
               }
+
               mainTimer();
 
             }, 5000);
         }
 
+        initNav();
+        activateUserLinks();
         mainTimer();
 
       });
