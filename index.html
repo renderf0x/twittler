@@ -27,9 +27,9 @@
         <div class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
               <li class="active"><a class="homelink" href="#"><span class="glyphicon glyphicon-home"></span> Home</a></li>
-              <li><a href="#about"><span class="glyphicon glyphicon-th-list"></span> People</a></li>
-              <li><a href="#contact"><span class="glyphicon glyphicon-user"></span> Profile</a></li>
-              <li><a href="#compose" class="btn btn-default"><span class="glyphicon glyphicon-pencil"></span> Compose</a>
+              <li><a class="userlistpane" href="#"><span class="glyphicon glyphicon-th-list"></span> People</a></li>
+              <li><a class="profilepane" href="#"><span class="glyphicon glyphicon-user"></span> Profile</a></li>
+              <li><a class="composelink" href="#" class="btn btn-default"><span class="glyphicon glyphicon-pencil"></span> Compose</a>
             </ul>
         </div><!--/.nav-collapse -->
     </div>
@@ -83,6 +83,7 @@
         var getNewTweets = function (){ //specify user for specific user's new tweets
           var newIndex;
           //iterate through streams.
+          applicationState.alertDisplayed = false;
           if (applicationState.mode === "home"){ //home stream, no user specified
             newIndex = streams.home.length - 1;
             while(newIndex > lastFetchIndex){
@@ -127,6 +128,7 @@
 
         var displayUserTweets = function(username){
           $body.html('');
+          applicationState.alertDisplayed = false;
           var userIndex = streams.users[username].length - 1;
           var lastFetchIndex = userIndex;
           //console.log("User Index is " + userIndex);
@@ -138,6 +140,30 @@
             $tweet.appendTo($body);
             userIndex -= 1;
           }
+        };
+
+        var displayUserPane = function(){
+          $body.html('<h3>Select a user to see their Tweets</h3><br /><div class="list-group"></div>');
+          var userList = [];
+          for (var user in streams.users){
+            userList.push(user);
+          }
+          console.log("User List is " + userList);
+
+          for (var i = 0; i < userList.length; i++){
+
+            var $element = $('<a href="#" class="list-group-item">' + userList[i] + '</a>');
+            $element.appendTo('.list-group');
+          }
+
+          $('.list-group-item').click(function(){
+              var clickedUser = $(this).text();
+              displayUserTweets(clickedUser);
+              applicationState.mode = "user";
+              applicationState.userView = clickedUser;
+              //applicationState.alertDisplayed = false;
+          });
+
         };
 
         var titleSet = function(numTweets){
@@ -158,6 +184,17 @@
                 $body.html('');
                 getNewTweets();
               }
+          });
+
+          $('.userlistpane').click(function(){
+            if(applicationState.mode === "userlistpane"){
+              //do nothing for now
+            }else{
+              applicationState.mode = "userlistpane"
+              lastFetchIndex = 0;
+              $body.html('');
+              displayUserPane();
+            }
           });
         };
 
