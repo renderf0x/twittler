@@ -55,7 +55,9 @@
         //globals
         var applicationState = {
           alertDisplayed: false,
-          mode: "home"
+          mode: "home",
+          userView: "",
+          lastFetchIndex: 0
         };
 
         // to do:
@@ -78,10 +80,10 @@
         }
 
 
-        var getNewTweets = function (user){ //specify user for specific user's new tweets
+        var getNewTweets = function (){ //specify user for specific user's new tweets
           var newIndex;
           //iterate through streams.
-          if (1){ //home stream, no user specified
+          if (applicationState.mode === "home"){ //home stream, no user specified
             newIndex = streams.home.length - 1;
             while(newIndex > lastFetchIndex){
               var tweet = streams.home[newIndex];
@@ -94,7 +96,20 @@
 
               }
               lastFetchIndex = streams.home.length -1;
+          }else{
+              //applicationState.mode === "user"
+              var user = applicationState.userView;
+              newIndex = streams.users[user].length - 1;
+              while(newIndex > lastFetchIndex){
+              var tweet = streams.users[user][newIndex];
+              var prettyTime = moment(tweet.created_at).fromNow();
+      
+              var $tweet = $('<div class="panel panel-default"><div class="panel-body">' + tweet.message +'</div><div class="panel-footer">' + '<a class="userlink" href="#"><strong>@' + tweet.user + '</strong></a> ' + '<small><em>' + prettyTime + '</em></small>' + '</div></div>');
+              $tweet.prependTo($body);
+              newIndex -= 1;
             }
+            lastFetchIndex = streams.users[user].length -1;
+          }
 
         };
 
@@ -106,12 +121,14 @@
               applicationState.alertDisplayed = false;
               displayUserTweets($username);
               applicationState.mode = "user";
+              applicationState.userView = $username;
           });
         };
 
         var displayUserTweets = function(username){
           $body.html('');
           var userIndex = streams.users[username].length - 1;
+          var lastFetchIndex = userIndex;
           //console.log("User Index is " + userIndex);
           while(userIndex >= 0){
             var tweet = streams.users[username][userIndex];
@@ -170,6 +187,27 @@
                   }
               }else if(applicationState.mode === "user"){
                 console.log("In User State");
+                var user = applicationState.userView;
+                var numNewTweets = streams.users[user].length - 1 - lastFetchIndex;
+                  if(numNewTweets > 0){
+                    titleSet(streams.users[user].length - 1 - lastFetchIndex);
+                    var $newTweetsMessage = $('<a href="#">Click here to display ' + numNewTweets + ' new Tweets from @' + user + '</a>');
+                    if (!applicationState.alertDisplayed){
+                      var $alertDiv = $('<div class="alert alert-info"></div>')
+                      $alertDiv.prependTo($body);
+                      applicationState.alertDisplayed = true;
+                    }
+
+                    $(".alert").html($newTweetsMessage).click(function(){
+                        getNewTweets();
+                        applicationState.alertDisplayed = false;
+                        titleSet(0);
+                        $(this).remove();
+                    });
+
+                    activateUserLinks();
+                    //getNewTweets();
+                  }
               }
 
               mainTimer();
