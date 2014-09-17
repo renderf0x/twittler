@@ -11,6 +11,7 @@ streams.users.shawndrost = [];
 streams.users.sharksforcheap = [];
 streams.users.mracus = [];
 streams.users.douglascalhoun = [];
+streams.users.anonymous = []; //added for add a tweet functionality
 window.users = Object.keys(streams.users);
 
 // utility function for adding tweets to our data structures
@@ -39,8 +40,16 @@ var randomMessage = function(){
 
 // generate random tweets on a random schedule
 var generateRandomTweet = function(){
+  /* Take out anonymous user */
+  var namedUsers = [];
+  for (var i = 0; i < users.length; i++){
+    if (users[i] != "anonymous"){
+      namedUsers.push(users[i]);
+    }
+  }
+
   var tweet = {};
-  tweet.user = randomElement(users);
+  tweet.user = randomElement(namedUsers);
   tweet.message = randomMessage();
   tweet.created_at = new Date();
   addTweet(tweet);
