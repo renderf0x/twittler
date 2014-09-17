@@ -16,6 +16,10 @@ window.users = Object.keys(streams.users);
 
 // utility function for adding tweets to our data structures
 var addTweet = function(newTweet){
+  /*if(newTweet.user === "anonymous"){
+    console.log('About to add New Tweet: ' + newTweet.message);
+  } */
+
   var username = newTweet.user;
   streams.users[username].push(newTweet);
   streams.home.push(newTweet);
@@ -41,12 +45,12 @@ var randomMessage = function(){
 // generate random tweets on a random schedule
 var generateRandomTweet = function(){
   /* Take out anonymous user */
-  var namedUsers = [];
+ var namedUsers = [];
   for (var i = 0; i < users.length; i++){
     if (users[i] != "anonymous"){
       namedUsers.push(users[i]);
     }
-  }
+  } 
 
   var tweet = {};
   tweet.user = randomElement(namedUsers);

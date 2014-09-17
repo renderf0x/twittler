@@ -44,7 +44,7 @@
             <h4 class="modal-title">Compose Tweet</h4>
           </div>
           <div class="modal-body">
-            <textarea class="compose-area"></textarea>
+            <textarea class="form-control compose-area" rows="3"></textarea>
             <!--<p>One fine body&hellip;</p>-->
           </div>
           <div class="modal-footer">
@@ -99,7 +99,7 @@
           var $tweet = $('<div></div>');
           $tweet.text('@' + tweet.user + ': ' + tweet.message);
           */
-          var $tweet = $('<div class="panel panel-default"><div class="panel-body">' + tweet.message +'</div><div class="panel-footer">' + '<a class="userlink" href="#"><strong>@' + tweet.user + '</strong></a> ' + '<small><em>' + prettyTime + '</em></small>' + '</div></div>');
+          var $tweet = $('<div class="panel panel-default"><div class="panel-body">' + tweet.message +'</div><div class="panel-footer">' + '<a class="userlink" href="#">' + '<img class="user-image" src="user-images/' + tweet.user + '.jpeg" />' + '<strong>@' + tweet.user + '</strong></a> ' + '<small><em>' + prettyTime + '</em></small>' + '</div></div>');
           $tweet.appendTo($body);
           index -= 1;
         }
@@ -115,7 +115,7 @@
               var tweet = streams.home[newIndex];
               var prettyTime = moment(tweet.created_at).fromNow();
       
-              var $tweet = $('<div class="panel panel-default"><div class="panel-body">' + tweet.message +'</div><div class="panel-footer">' + '<a class="userlink" href="#"><strong>@' + tweet.user + '</strong></a> ' + '<small><em>' + prettyTime + '</em></small>' + '</div></div>');
+              var $tweet = $('<div class="panel panel-default"><div class="panel-body">' + tweet.message +'</div><div class="panel-footer">' + '<a class="userlink" href="#">' + '<img class="user-image" src="user-images/' + tweet.user + '.jpeg" />' + '<strong>@' + tweet.user + '</strong></a> ' + '<small><em>' + prettyTime + '</em></small>' + '</div></div>');
               $tweet.prependTo($body);
               newIndex -= 1;
 
@@ -130,7 +130,7 @@
               var tweet = streams.users[user][newIndex];
               var prettyTime = moment(tweet.created_at).fromNow();
       
-              var $tweet = $('<div class="panel panel-default"><div class="panel-body">' + tweet.message +'</div><div class="panel-footer">' + '<a class="userlink" href="#"><strong>@' + tweet.user + '</strong></a> ' + '<small><em>' + prettyTime + '</em></small>' + '</div></div>');
+              var $tweet = $('<div class="panel panel-default"><div class="panel-body">' + tweet.message +'</div><div class="panel-footer">' + '<a class="userlink" href="#">' + '<img class="user-image" src="user-images/' + tweet.user + '.jpeg" />' + '<strong>@' + tweet.user + '</strong></a> ' + '<small><em>' + prettyTime + '</em></small>' + '</div></div>');
               $tweet.prependTo($body);
               newIndex -= 1;
             }
@@ -163,7 +163,7 @@
             var tweet = streams.users[username][userIndex];
             var prettyTime = moment(tweet.created_at).fromNow();
           
-            var $tweet = $('<div class="panel panel-default"><div class="panel-body">' + tweet.message +'</div><div class="panel-footer">' + '<a class="userlink" href="#"><strong>@' + tweet.user + '</strong></a> ' + '<small><em>' + prettyTime + '</em></small>' + '</div></div>');
+            var $tweet = $('<div class="panel panel-default"><div class="panel-body">' + tweet.message +'</div><div class="panel-footer">' + '<a class="userlink" href="#">' + '<img class="user-image" src="user-images/' + tweet.user + '.jpeg" />' + '<strong>@' + tweet.user + '</strong></a> ' + '<small><em>' + prettyTime + '</em></small>' + '</div></div>');
             $tweet.appendTo($body);
             userIndex -= 1;
           }
@@ -228,14 +228,16 @@
 
           $('.composelink').click(function(){
               $('#compose-tweet').modal();
-              $('.send-tweet').click(function(){
+          });
+        };
+
+        var setupTweetButton = function(){
+          $('.send-tweet').click(function(){
                 var message = $('.compose-area').val();
-                console.log('message is' + message);
                 writeTweet(message);
                 $('.compose-area').val('');
                 $('#compose-tweet').modal('hide');
                 });
-          });
         };
 
         var mainTimer = function(){
@@ -295,6 +297,7 @@
         initNav();
         activateUserLinks();
         mainTimer();
+        setupTweetButton();
 
       });
 
